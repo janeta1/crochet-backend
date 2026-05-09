@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./db/database.js";
-import tokenRouter from "./routes/token.js";
+import tokenRoutes from "./routes/token.js";
+import projectsRoutes from "./routes/projects.js";
 
 dotenv.config();
 
@@ -13,7 +14,8 @@ app.use(cors()); // Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON bodies
 
 // Routes
-app.use("/token", tokenRouter);
+app.use("/token", tokenRoutes);
+app.use("/projects", projectsRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Stitchbook API is running!" });
