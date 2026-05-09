@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/janeta1/crochet-backend#readme",
   "dependencies": {
+    "better-sqlite3": "^12.9.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
