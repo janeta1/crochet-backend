@@ -1,2 +1,5 @@
 node_modules/
 .env
+db/stitchbook.db
+db/stitchbook.db-shm
+db/stitchbook.db-wal
