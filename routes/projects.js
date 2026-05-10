@@ -43,6 +43,8 @@ const router = express.Router();
  *                   type: integer
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 // GET /projects - implements pagination
 router.get("/", authenticate, (req, res) => {
@@ -105,6 +107,8 @@ router.get("/", authenticate, (req, res) => {
  *         description: Project not found
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 // GET /projects/:id
 router.get("/:id", authenticate, (req, res) => {
@@ -197,6 +201,8 @@ router.get("/:id", authenticate, (req, res) => {
  *         description: Unauthorized
  *       403:
  *         description: Admin access required
+ *       500:
+ *         description: Internal server error
  */
 // POST /projects - create new project
 router.post("/", authenticate, requireAdmin, (req, res) => {
@@ -327,6 +333,8 @@ router.post("/", authenticate, requireAdmin, (req, res) => {
  *         description: Admin access required
  *       404:
  *         description: Project not found
+ *       500:
+ *         description: Internal server error
  */
 // PUT /projects/:id - update existing project
 router.put("/:id", authenticate, requireAdmin, (req, res) => {
@@ -447,7 +455,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
  *                 type: boolean
  *               completedAt:
  *                 type: string
- *                 example: "2024-06-01T12:00:00Z"
+ *                 example: "2026-05-10T12:00:00Z"
  *     responses:
  *       200:
  *         description: Project updated successfully
@@ -457,6 +465,8 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
  *         description: Admin access required
  *       404:
  *         description: Project not found
+ *       500:
+ *         description: Internal server error
  */
 // PATCH /projects/:id - partial updates (status change, mark as favorite, update completed at)
 router.patch("/:id", authenticate, requireAdmin, (req, res) => {
@@ -520,6 +530,8 @@ router.patch("/:id", authenticate, requireAdmin, (req, res) => {
  *         description: Admin access required
  *       404:
  *         description: Project not found
+ *       500:
+ *         description: Internal server error
  */
 // DELETE /projects/:id - delete project
 router.delete("/:id", authenticate, requireAdmin, (req, res) => {

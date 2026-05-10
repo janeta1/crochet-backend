@@ -4,6 +4,37 @@ import { authenticate, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /sessions:
+ *   get:
+ *     summary: Get all sessions for a project (paginated)
+ *     tags: [Sessions]
+ *     parameters:
+ *       - in: query
+ *         name: projectId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           example: 0
+ *     responses:
+ *       200:
+ *         description: List of sessions
+ *       400:
+ *         description: projectId is required
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 // GET /sessions - implements pagination
 router.get("/", authenticate, (req, res) => {
   try {
@@ -31,6 +62,50 @@ router.get("/", authenticate, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /sessions:
+ *   post:
+ *     summary: Log a new session
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [projectId, date]
+ *             properties:
+ *               projectId:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 example: "2026-05-10"
+ *               duration:
+ *                 type: integer
+ *                 example: 60
+ *               note:
+ *                 type: string
+ *                 example: "Made good progress today!"
+ *               partUpdates:
+ *                 type: object
+ *                 example: { "partId1": 10, "partId2": 5 } 
+ *     responses:
+ *       201:
+ *         description: Session logged successfully
+ *       400:
+ *         description: projectId and date are required
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Project not found
+ *       500:
+ *         description: Internal server error             
+ */
 // POST /sessions - create a new session
 router.post("/", authenticate, requireAdmin, (req, res) => {
   try {
@@ -81,6 +156,32 @@ router.post("/", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /sessions/{id}:
+ *   delete:
+ *     summary: Delete a session
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Session deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Internal server error
+ */
 // DELETE /sessions/:id - delete a session
 router.delete("/:id", authenticate, requireAdmin, (req, res) => {
     try {
