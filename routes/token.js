@@ -3,6 +3,41 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /token:
+ *   post:
+ *     summary: Generate a JWT token for authentication
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [admin, visitor]
+ *                 example: visitor
+ *     responses:
+ *       200:
+ *         description: Token generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 expiresIn:
+ *                   type: string
+ *                   example: 1 minute
+ *       400:
+ *         description: Invalid role specified
+ */
 // POST /token
 router.post("/", (req, res) => {
   try {
