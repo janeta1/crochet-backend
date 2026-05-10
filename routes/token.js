@@ -53,7 +53,7 @@ router.post("/", (req, res) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "1h",
     });
 
     res.json({ token, role: payload.role, expiresIn: "1 minute" });
