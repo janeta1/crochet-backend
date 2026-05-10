@@ -4,6 +4,33 @@ import { authenticate, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /yarns:
+ *   get:
+ *     summary: Get all yarns (paginated)
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           example: 0
+ *     responses:
+ *       200:
+ *         description: List of yarns
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 // GET /yarns - implements pagination
 router.get("/", authenticate, (req, res) => {
   try {
@@ -27,6 +54,30 @@ router.get("/", authenticate, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /yarns/{id}:
+ *   get:
+ *     summary: Get a yarn by ID
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Yarn found
+ *       404:
+ *         description: Yarn not found
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
 // GET /yarns/:id
 router.get("/:id", authenticate, (req, res) => {
   try {
@@ -44,6 +95,49 @@ router.get("/:id", authenticate, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /yarns:
+ *   post:
+ *     summary: Create a new yarn
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Soft Merino"
+ *               brand:
+ *                 type: string
+ *                 example: "Cozy Yarns"
+ *               color:
+ *                 type: string
+ *                 example: "#FF77AA"
+ *               weight:
+ *                 type: string
+ *                 example: "DK"
+ *               quantity:
+ *                 type: integer
+ *                 example: 3
+ *     responses:
+ *       201:
+ *         description: Yarn created successfully
+ *       400:
+ *         description: Yarn name is required
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       500:
+ *         description: Internal server error
+ */
 // POST /yarns - create a new yarn
 router.post("/", authenticate, requireAdmin, (req, res) => {
   try {
@@ -74,6 +168,48 @@ router.post("/", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /yarns/{id}:
+ *   put:
+ *     summary: Full update of a yarn
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               brand:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *               weight:
+ *                 type: string
+ *               quantity:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Yarn updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Yarn not found
+ *       500:
+ *         description: Internal server error
+ */
 // PUT /yarns/:id - update a yarn
 router.put("/:id", authenticate, requireAdmin, (req, res) => {
   try {
@@ -108,6 +244,41 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /yarns/{id}:
+ *   patch:
+ *     summary: Toggle yarn favorite
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isFavorite:
+ *                 type: boolean
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Yarn updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Yarn not found
+ *       500:
+ *         description: Internal server error
+ */
 // PATCH /yarns/:id - partial update (toggle favorite)
 router.patch("/:id", authenticate, requireAdmin, (req, res) => {
   try {
@@ -136,6 +307,32 @@ router.patch("/:id", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /yarns/{id}:
+ *   delete:
+ *     summary: Delete a yarn
+ *     tags: [Yarns]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Yarn deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Yarn not found
+ *       500:
+ *         description: Internal server error
+ */
 // DELETE /yarns/:id - delete a yarn
 router.delete("/:id", authenticate, requireAdmin, (req, res) => {
     try {

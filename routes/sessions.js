@@ -10,6 +10,8 @@ const router = express.Router();
  *   get:
  *     summary: Get all sessions for a project (paginated)
  *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: projectId
