@@ -4,6 +4,46 @@ import { authenticate, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /projects:
+ *   get:
+ *     summary: Get all projects (paginated)
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           example: 0
+ *     responses:
+ *       200:
+ *         description: List of projects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 total:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 offset:
+ *                   type: integer
+ *       401:
+ *         description: Unauthorized
+ */
 // GET /projects - implements pagination
 router.get("/", authenticate, (req, res) => {
   try {
@@ -44,6 +84,28 @@ router.get("/", authenticate, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /projects/{id}:
+ *   get:
+ *     summary: Get project by ID
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Project found
+ *       404:
+ *         description: Project not found
+ *       401:
+ *         description: Unauthorized
+ */
 // GET /projects/:id
 router.get("/:id", authenticate, (req, res) => {
   try {
@@ -79,6 +141,63 @@ router.get("/:id", authenticate, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /projects:
+ *   post:
+ *     summary: Create a new project
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Granny Square Blanket
+ *               hookSize:
+ *                 type: string
+ *                 example: 5mm
+ *               color:
+ *                 type: string
+ *                 example: "#C4A0A0"      
+ *               status:
+ *                 type: string
+ *                 enum: [queued, in_progress, done]  
+ *                 example: queued
+ *               parts:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     quantity:
+ *                       type: integer
+ *                     totalRows:
+ *                       type: integer
+ *                     completedRows:
+ *                       type: integer
+ *               yarns:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: []
+ *     responses:
+ *       201:
+ *         description: Project created successfully 
+ *       400:
+ *         description: Project name is required
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ */
 // POST /projects - create new project
 router.post("/", authenticate, requireAdmin, (req, res) => {
   try {
@@ -150,6 +269,65 @@ router.post("/", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /projects/{id}:
+ *   put:
+ *     summary: Update an existing project (full update)
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               hookSize:
+ *                 type: string
+ *               color:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [queued, in-progress, done]
+ *               isFavorite:
+ *                 type: boolean
+ *               parts:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     quantity:
+ *                       type: integer
+ *                     totalRows:
+ *                       type: integer
+ *                     completedRows:
+ *                       type: integer
+ *               yarns:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: []
+ *     responses:
+ *       200:
+ *         description: Project updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Project not found
+ */
 // PUT /projects/:id - update existing project
 router.put("/:id", authenticate, requireAdmin, (req, res) => {
   try {
@@ -242,7 +420,45 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
   }
 });
 
-// PATCH /projects/:id - partial updates (status change, mark as favorite, update time spent)
+/**
+ * @swagger
+ * /projects/{id}:
+ *   patch:
+ *     summary: Partial update (status, favorite, completed at)
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [queued, in-progress, done]
+ *               isFavorite:
+ *                 type: boolean
+ *               completedAt:
+ *                 type: string
+ *                 example: "2024-06-01T12:00:00Z"
+ *     responses:
+ *       200:
+ *         description: Project updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Project not found
+ */
+// PATCH /projects/:id - partial updates (status change, mark as favorite, update completed at)
 router.patch("/:id", authenticate, requireAdmin, (req, res) => {
   try {
     const project = db
@@ -281,6 +497,30 @@ router.patch("/:id", authenticate, requireAdmin, (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /projects/{id}:
+ *   delete:
+ *     summary: Delete a project
+ *     tags: [Projects]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Project deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ *       404:
+ *         description: Project not found
+ */
 // DELETE /projects/:id - delete project
 router.delete("/:id", authenticate, requireAdmin, (req, res) => {
   try {
