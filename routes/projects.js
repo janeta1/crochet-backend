@@ -182,7 +182,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       status !== undefined ? status : project.status,
       isFavorite !== undefined ? (isFavorite ? 1 : 0) : project.is_favorite,
       timeSpent !== undefined ? timeSpent : project.time_spent,
-      completedAt || project.completed_at,
+      completedAt !== undefined ? completedAt : project.completed_at,
       req.params.id,
     );
 
@@ -205,7 +205,9 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
 
     if (req.body.yarns) {
       // delete existing yarn associations
-      db.prepare("DELETE FROM project_yarns WHERE project_id = ?").run(req.params.id);
+      db.prepare("DELETE FROM project_yarns WHERE project_id = ?").run(
+        req.params.id,
+      );
       req.body.yarns.forEach((yarnId) => {
         db.prepare(
           "INSERT INTO project_yarns (project_id, yarn_id) VALUES (?, ?)",
@@ -234,6 +236,45 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       parts,
       sessions,
       yarns,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// PATCH /projects/:id - partial updates (status change, mark as favorite, update time spent)
+router.patch("/:id", authenticate, requireAdmin, (req, res) => {
+  try {
+    const project = db
+      .prepare("SELECT * FROM projects WHERE id = ?")
+      .get(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const {
+      status,
+      isFavorite,
+      completedAt,
+    } = req.body;
+
+    db.prepare(
+      "UPDATE projects SET status = ?, is_favorite = ?, completed_at = ? WHERE id = ?",
+    ).run(
+      status !== undefined ? status : project.status,
+      isFavorite !== undefined ? (isFavorite ? 1 : 0) : project.is_favorite,
+      completedAt !== undefined ? completedAt : project.completed_at,
+      req.params.id,
+    );
+
+    const updated = db
+      .prepare("SELECT * FROM projects WHERE id = ?")
+      .get(req.params.id);
+
+    res.json({
+      ...updated,
+      is_favorite: Boolean(updated.is_favorite),
     });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
