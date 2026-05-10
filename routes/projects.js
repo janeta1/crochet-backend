@@ -372,7 +372,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       req.params.id,
     );
 
-    if (req.body.parts) {
+    if (req.body.parts && req.body.parts.length > 0) {
       // delete existing parts
       db.prepare("DELETE FROM parts WHERE project_id = ?").run(req.params.id);
       req.body.parts.forEach((part) => {
@@ -389,7 +389,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       });
     }
 
-    if (req.body.yarns) {
+    if (req.body.yarns && req.body.yarns.length > 0) {
       // delete existing yarn associations
       db.prepare("DELETE FROM project_yarns WHERE project_id = ?").run(
         req.params.id,
@@ -424,6 +424,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       yarns,
     });
   } catch (error) {
+    console.error('PUT /projects/:id error:', error)
     res.status(500).json({ error: "Internal server error" });
   }
 });
