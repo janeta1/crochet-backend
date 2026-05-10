@@ -383,8 +383,8 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
           req.params.id,
           part.name,
           part.quantity || 1,
-          part.total_rows || 0,
-          part.completed_rows || 0,
+          parseInt(part.totalRows) || 0,
+          parseInt(part.completedRows) || 0,
         );
       });
     }
