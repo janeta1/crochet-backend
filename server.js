@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import db from "./db/database.js";
 import tokenRoutes from "./routes/token.js";
 import projectsRoutes from "./routes/projects.js";
+import sessionsRoutes from "./routes/sessions.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json()); // Parse JSON bodies
 // Routes
 app.use("/token", tokenRoutes);
 app.use("/projects", projectsRoutes);
+app.use("/sessions", sessionsRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Stitchbook API is running!" });
