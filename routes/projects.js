@@ -169,10 +169,10 @@ router.get("/:id", authenticate, (req, res) => {
  *                 example: 5mm
  *               color:
  *                 type: string
- *                 example: "#C4A0A0"      
+ *                 example: "#C4A0A0"
  *               status:
  *                 type: string
- *                 enum: [queued, in_progress, done]  
+ *                 enum: [queued, in_progress, done]
  *                 example: queued
  *               parts:
  *                 type: array
@@ -194,7 +194,7 @@ router.get("/:id", authenticate, (req, res) => {
  *                 example: []
  *     responses:
  *       201:
- *         description: Project created successfully 
+ *         description: Project created successfully
  *       400:
  *         description: Project name is required
  *       401:
@@ -424,7 +424,7 @@ router.put("/:id", authenticate, requireAdmin, (req, res) => {
       yarns,
     });
   } catch (error) {
-    console.error('PUT /projects/:id error:', error)
+    console.error("PUT /projects/:id error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -480,11 +480,7 @@ router.patch("/:id", authenticate, requireAdmin, (req, res) => {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const {
-      status,
-      isFavorite,
-      completedAt,
-    } = req.body;
+    const { status, isFavorite, completedAt } = req.body;
 
     db.prepare(
       "UPDATE projects SET status = ?, is_favorite = ?, completed_at = ? WHERE id = ?",
@@ -499,9 +495,24 @@ router.patch("/:id", authenticate, requireAdmin, (req, res) => {
       .prepare("SELECT * FROM projects WHERE id = ?")
       .get(req.params.id);
 
+    const parts = db
+      .prepare("SELECT * FROM parts WHERE project_id = ?")
+      .all(req.params.id);
+    const sessions = db
+      .prepare("SELECT * FROM sessions WHERE project_id = ?")
+      .all(req.params.id);
+    const yarns = db
+      .prepare(
+        "SELECT yarns.* FROM yarns JOIN project_yarns ON yarns.id = project_yarns.yarn_id WHERE project_yarns.project_id = ?",
+      )
+      .all(req.params.id);
+
     res.json({
       ...updated,
       is_favorite: Boolean(updated.is_favorite),
+      parts,
+      sessions,
+      yarns,
     });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
